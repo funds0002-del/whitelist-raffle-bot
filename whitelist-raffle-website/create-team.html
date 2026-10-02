@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Team</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DCEASED RAFFLES</div>
+      <nav class="nav">
+        <a href="teams.html">Back</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Create a team</h1>
+    </section>
+
+    <section class="card" style="padding:18px; margin-bottom:80px;">
+      <p style="margin:12px 0;"><input id="name" placeholder="Team name" style="width:100%; padding:12px; border-radius:10px; border:1px solid #2a2a38; background:#0f0f16; color:white;"></p>
+      <p style="margin:12px 0;"><input id="project" placeholder="Project name" style="width:100%; padding:12px; border-radius:10px; border:1px solid #2a2a38; background:#0f0f16; color:white;"></p>
+      <p style="margin:12px 0;"><input id="twitter" placeholder="X / Twitter link" style="width:100%; padding:12px; border-radius:10px; border:1px solid #2a2a38; background:#0f0f16; color:white;"></p>
+      <p style="margin:12px 0;"><input id="discord" placeholder="Discord invite" style="width:100%; padding:12px; border-radius:10px; border:1px solid #2a2a38; background:#0f0f16; color:white;"></p>
+      <p style="margin:12px 0;"><input id="ownerId" placeholder="Owner Discord user ID" style="width:100%; padding:12px; border-radius:10px; border:1px solid #2a2a38; background:#0f0f16; color:white;"></p>
+      <button class="btn" id="create-btn">Create team</button>
+      <p class="meta" id="result" style="margin-top:12px;"></p>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById('create-btn').onclick = async () => {
+      const result = document.getElementById('result');
+      result.textContent = 'Saving...';
+
+      const res = await fetch('/api/teams', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: document.getElementById('name').value,
+          project: document.getElementById('project').value,
+          twitter: document.getElementById('twitter').value,
+          discord: document.getElementById('discord').value,
+          ownerId: document.getElementById('ownerId').value
+        })
+      });
+
+      const data = await res.json();
+      result.textContent = res.ok ? `Created ${data.id}` : (data.error || 'Could not create team');
+    };
+  </script>
+</body>
+</html>

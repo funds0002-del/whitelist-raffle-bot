@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Winners</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DCEASED RAFFLES</div>
+      <nav class="nav">
+        <a href="index.html">Raffles</a>
+        <a href="teams.html">Teams</a>
+        <a href="collabs.html">Collabs</a>
+        <a href="winners.html">Winners</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Winners</h1>
+      <p>Ended raffles and the people who won.</p>
+    </section>
+
+    <section class="grid" id="winner-list"></section>
+  </div>
+
+  <script>
+    async function loadWinners() {
+      const res = await fetch('/api/raffles');
+      const raffles = await res.json();
+      const ended = raffles.filter(raffle => raffle.status === 'ended');
+      const list = document.getElementById('winner-list');
+
+      if (!ended.length) {
+        list.innerHTML = '<p class="meta">No ended raffles yet.</p>';
+        return;
+      }
+
+      list.innerHTML = ended.map(raffle => {
+        const winners = raffle.winnersSelected || [];
+        const emails = raffle.winnerEmails || {};
+        const winnerText = winners.length
+          ? winners.map((id, i) => (i + 1) + '. ' + id + ' — ' + (emails[id] || 'no email')).join('<br>')
+          : 'No winners';
+
+        return (
+          '<article class="card"><div class="card-body">' +
+          '<div class="status">ended</div>' +
+          '<h3>' + raffle.title + '</h3>' +
+          '<p class="meta">' + raffle.id + ' • ' + raffle.entries + ' entries</p>' +
+          '<p class="meta">' + winnerText + '</p>' +
+          '</div></article>'
+        );
+      }).join('');
+    }
+
+    loadWinners();
+  </script>
+</body>
+</html>

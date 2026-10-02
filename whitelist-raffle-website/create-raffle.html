@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create raffle</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DCEASED RAFFLES</div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="raffles.html">Raffles</a>
+        <a href="teams.html">Teams</a>
+        <a href="collabs.html">Collabs</a>
+        <a href="/auth/discord">Login with Discord</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Create a raffle</h1>
+      <p>Choose a server, a channel, and a project picture. The raffle will be posted in Discord.</p>
+    </section>
+
+    <section class="card" style="padding:18px; margin-bottom:80px;">
+      <p style="margin:12px 0;"><input id="title" placeholder="Raffle title"></p>
+      <p style="margin:12px 0;"><input id="description" placeholder="Description"></p>
+      <p style="margin:12px 0;"><input id="winners" placeholder="Number of winners"></p>
+      <p style="margin:12px 0;"><input id="hours" placeholder="Hours until it ends"></p>
+      <p style="margin:12px 0;">
+        <select id="guildId"></select>
+      </p>
+      <p style="margin:12px 0;">
+        <select id="channelId"></select>
+      </p>
+      <p style="margin:12px 0;">
+        <input id="banner" type="file" accept="image/*">
+      </p>
+      <button class="btn" id="create-btn">Create and post to Discord</button>
+      <p class="meta" id="result"></p>
+    </section>
+  </div>
+
+  <script>
+    const guildSelect = document.getElementById('guildId');
+    const channelSelect = document.getElementById('channelId');
+
+    async function loadGuilds() {
+      const res = await fetch('/api/my-guilds');
+      const guilds = await res.json();
+      if (!res.ok) {
+        guildSelect.innerHTML = '<option>Login with Discord first</option>';
+        return;
+      }
+      guildSelect.innerHTML = guilds.map(g =>
+        '<option value="' + g.id + '">' + g.name + '</option>'
+      ).join('') || '<option>No shared servers</option>';
+      loadChannels();
+    }
+
+    async function loadChannels() {
+      const guildId = guildSelect.value;
+      if (!guildId) return;
+      const res = await fetch('/api/guilds/' + guildId + '/channels');
+      const channels = await res.json();
+      channelSelect.innerHTML = (channels || []).map(ch =>
+        '<option value="' + ch.id + '">#' + ch.name + '</option>'
+      ).join('') || '<option>No channels</option>';
+    }
+
+    guildSelect.onchange = loadChannels;
+    loadGuilds();
+
+    document.getElementById('create-btn').onclick = async () => {
+      const result = document.getElementById('result');
+      result.textContent = 'Creating...';
+
+      const form = new FormData();
+      form.append('title', document.getElementById('title').value);
+      form.append('description', document.getElementById('description').value);
+      form.append('winners', document.getElementById('winners').value);
+      form.append('hours', document.getElementById('hours').value);
+      form.append('channelId', channelSelect.value);
+      if (document.getElementById('banner').files[0]) {
+        form.append('banner', document.getElementById('banner').files[0]);
+      }
+
+      const res = await fetch('/api/raffles/create', {
+        method: 'POST',
+        body: form
+      });
+      const data = await res.json();
+      result.textContent = res.ok ? ('Posted ' + data.id) : (data.error || 'Could not create raffle');
+    };
+  </script>
+</body>
+</html>

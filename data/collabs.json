@@ -1,0 +1,18 @@
+{
+  "nextCollabNumber": 2,
+  "collabs": {
+    "COLLAB-0001": {
+      "id": "COLLAB-0001",
+      "fromTeamId": "TEAM-0001",
+      "toTeamId": "TEAM-0002",
+      "fromTeamName": "3dceased",
+      "toTeamName": "MAYHEM",
+      "spots": 10,
+      "message": "hg ufugfyu",
+      "status": "accepted",
+      "createdAt": 1790823546677,
+      "raffleId": "RAFFLE-0002",
+      "raffleTitle": "uaphuiaha"
+    }
+  }
+}

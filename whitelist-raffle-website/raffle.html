@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raffle</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DCEASED RAFFLES</div>
+      <nav class="nav">
+        <a href="landing-page.html">Home</a>
+        <a href="raffles.html">Raffles</a>
+        <a href="teams.html">Teams</a>
+        <a href="collabs.html">Collabs</a>
+        <a href="winners.html">Winners</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="status" id="status">ACTIVE</div>
+      <h1 id="title">Raffle</h1>
+      <p id="description"></p>
+      <p class="meta" id="meta"></p>
+    </section>
+
+    <section class="card" style="padding:18px; margin-bottom:80px;">
+      <h3>Enter this raffle</h3>
+      <p style="margin:12px 0;">
+        <input id="discord-id" placeholder="Discord user ID">
+      </p>
+      <p style="margin:12px 0;">
+        <input id="email" placeholder="Email address">
+      </p>
+      <p style="margin:12px 0;">
+  <input id="wallet" placeholder="Wallet address">
+</p>
+      <button class="btn" id="enter-btn">Enter raffle</button>
+      <p class="meta" id="result"></p>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

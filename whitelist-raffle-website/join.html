@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Join team</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DCEASED RAFFLES</div>
+      <nav class="nav"><a href="/auth/discord">Login with Discord</a></nav>
+    </header>
+    <section class="hero">
+      <h1>Join team</h1>
+      <button class="btn" id="join-btn">Join</button>
+      <p class="meta" id="result"></p>
+    </section>
+  </div>
+  <script>
+    document.getElementById('join-btn').onclick = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const res = await fetch('/api/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: params.get('code'), team: params.get('team') })
+      });
+      const data = await res.json();
+      document.getElementById('result').textContent = data.message || data.error || 'Could not join';
+    };
+  </script>
+</body>
+</html>

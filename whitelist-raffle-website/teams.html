@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teams</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DCEASED RAFFLES</div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="raffles.html">Raffles</a>
+        <a href="teams.html">Teams</a>
+        <a href="collabs.html">Collabs</a>
+        <a href="winners.html">Winners</a>
+        <a href="/auth/discord">Login with Discord</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Your teams</h1>
+      <p>Only teams you own or were invited to are shown here.</p>
+      <a class="btn" href="create-team.html">Create team</a>
+    </section>
+
+    <section class="grid" id="team-list"></section>
+
+    <section class="card" style="padding:18px; margin-bottom:80px;">
+      <h3>Invite a member</h3>
+      <p class="meta">Use your own team ID, such as TEAM-0004. The other person is joining your team.</p>
+      <p style="margin:12px 0;"><input id="teamId" placeholder="Your team ID"></p>
+      <p style="margin:12px 0;"><input id="memberId" placeholder="Discord user ID, optional"></p>
+      <p style="margin:12px 0;"><input id="memberName" placeholder="Username, optional"></p>
+      <button class="btn" id="invite-btn">Invite by ID</button>
+      <button class="btn gray" id="link-btn">Create invite link</button>
+      <p class="meta" id="invite-result"></p>
+    </section>
+  </div>
+
+  <script>
+    async function loadTeams() {
+      const res = await fetch('/api/teams');
+      const teams = await res.json();
+      const list = document.getElementById('team-list');
+      if (!teams.length) {
+        list.innerHTML = '<p class="meta">No teams yet. Log in and create one.</p>';
+        return;
+      }
+      list.innerHTML = teams.map(team => `
+        <article class="card">
+          <div class="banner"></div>
+          <div class="card-body">
+            <div class="status">${team.id}</div>
+            <h3>${team.name}</h3>
+            <p class="meta">${team.project}<br>${(team.members || []).length} members</p>
+          <a class="btn" href="dashboard.html?id=${team.id}">Dashboard</a>
+            </div>
+        </article>
+      `).join('');
+    }
+
+    document.getElementById('invite-btn').onclick = async () => {
+      const result = document.getElementById('invite-result');
+      const teamId = document.getElementById('teamId').value.trim();
+      const res = await fetch('/api/teams/' + teamId + '/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discordId: document.getElementById('memberId').value.trim(),
+          username: document.getElementById('memberName').value.trim()
+        })
+      });
+      const data = await res.json();
+      result.textContent = res.ok ? 'Invited' : (data.error || 'Could not invite');
+      loadTeams();
+    };
+
+    document.getElementById('link-btn').onclick = async () => {
+      const result = document.getElementById('invite-result');
+      const teamId = document.getElementById('teamId').value.trim();
+      const res = await fetch('/api/teams/' + teamId + '/invite-link', { method: 'POST' });
+      const data = await res.json();
+      result.textContent = res.ok
+        ? ('Send this link: http://localhost:3000' + data.link)
+        : (data.error || 'Could not create link');
+    };
+
+    loadTeams();
+  </script>
+</body>
+</html>

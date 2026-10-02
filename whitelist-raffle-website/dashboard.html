@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Team dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DCEASED RAFFLES</div>
+      <nav class="nav">
+        <a href="teams.html">Teams</a>
+        <a href="/auth/discord">Login with Discord</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <h1 id="title">Dashboard</h1>
+      <p id="stats" class="meta"></p>
+    </section>
+    <section class="grid" id="members"></section>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    fetch('/api/teams/' + params.get('id') + '/dashboard')
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById('title').textContent = data.error;
+          return;
+        }
+        document.getElementById('title').textContent = data.team.name;
+        document.getElementById('stats').textContent =
+          data.activeRaffles + ' active raffles • ' +
+          data.endedRaffles + ' ended • ' +
+          data.entries + ' entries • ' +
+          data.collabs + ' collabs';
+        document.getElementById('members').innerHTML = data.members.map(member =>
+          '<article class="card"><div class="card-body"><div class="status">' + member.role +
+          '</div><h3>' + (member.username || 'Member') + '</h3><p class="meta">' +
+          member.discordId + '</p></div></article>'
+        ).join('');
+      });
+  </script>
+</body>
+</html>

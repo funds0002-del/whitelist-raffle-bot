@@ -1,0 +1,248 @@
+{
+  "nextRaffleNumber": 13,
+  "raffles": {
+    "RAFFLE-0001": {
+      "id": "RAFFLE-0001",
+      "title": "asjhuaifu",
+      "description": "fhahf",
+      "winners": 1,
+      "duration": "1h",
+      "endTime": 1788922757999,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1547063823868104755",
+      "creatorId": "1509356657359196251",
+      "participants": [
+        "1509356657359196251"
+      ],
+      "winnersSelected": [
+        "1509356657359196251"
+      ],
+      "status": "ended",
+      "createdAt": 1788919157999
+    },
+    "RAFFLE-0002": {
+      "id": "RAFFLE-0002",
+      "title": "uaphuiaha",
+      "description": "uahfnahu",
+      "winners": 2,
+      "duration": "1h",
+      "endTime": 1788923593156,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1547067327152136294",
+      "creatorId": "1509356657359196251",
+      "participants": [
+        "1509356657359196251"
+      ],
+      "winnersSelected": [
+        "1509356657359196251"
+      ],
+      "status": "ended",
+      "createdAt": 1788919993156
+    },
+    "RAFFLE-0003": {
+      "id": "RAFFLE-0003",
+      "title": "TESTING PT2",
+      "description": "Testing part 2",
+      "winners": 3,
+      "duration": "10h",
+      "endTime": 1789000907033,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1547255722759163987",
+      "creatorId": "1509356657359196251",
+      "participants": [],
+      "winnersSelected": [],
+      "status": "ended",
+      "createdAt": 1788964907054
+    },
+    "RAFFLE-0004": {
+      "id": "RAFFLE-0004",
+      "title": "TESTING PT2",
+      "description": "Testing part 2",
+      "winners": 3,
+      "duration": "10h",
+      "endTime": 1789001032830,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1547256244442497155",
+      "creatorId": "1509356657359196251",
+      "participants": [
+        "1509356657359196251",
+        "1171834096046051421",
+        "929304796798812200"
+      ],
+      "winnersSelected": [
+        "929304796798812200",
+        "1509356657359196251",
+        "1171834096046051421"
+      ],
+      "status": "ended",
+      "createdAt": 1788965032837
+    },
+    "RAFFLE-0005": {
+      "id": "RAFFLE-0005",
+      "title": "TESTING WHITELIST BOT",
+      "description": "This raffle is about testing the bot",
+      "winners": 5,
+      "duration": "24h",
+      "endTime": 1789059198371,
+      "guildId": "1434958995025694822",
+      "channelId": "1543671479428976800",
+      "messageId": "1547288815893352449",
+      "creatorId": "1171834096046051421",
+      "participants": [],
+      "winnersSelected": [],
+      "status": "ended",
+      "createdAt": 1788972798433
+    },
+    "RAFFLE-0006": {
+      "id": "RAFFLE-0006",
+      "title": "TESTING WHITELIST BOT",
+      "description": "This raffle is about testing the bot",
+      "winners": 5,
+      "duration": "24h",
+      "endTime": 1789059477628,
+      "guildId": "1434958995025694822",
+      "channelId": "1545448121432015008",
+      "messageId": "1547289982639800443",
+      "creatorId": "1171834096046051421",
+      "participants": [
+        "1171834096046051421",
+        "1509356657359196251",
+        "811736818931466270"
+      ],
+      "winnersSelected": [
+        "811736818931466270",
+        "1509356657359196251",
+        "1171834096046051421"
+      ],
+      "status": "ended",
+      "createdAt": 1788973077630
+    },
+    "RAFFLE-0007": {
+      "id": "RAFFLE-0007",
+      "title": "gcfctg",
+      "description": "ug;.j",
+      "winners": 2,
+      "duration": "1h",
+      "endTime": 1789519682215,
+      "guildId": "1542302785909817404",
+      "channelId": "1542302786480377928",
+      "messageId": "1549567507109650533",
+      "creatorId": "1509356657359196251",
+      "participants": [
+        "1509356657359196251",
+        "1171834096046051421"
+      ],
+      "winnersSelected": [
+        "1171834096046051421",
+        "1509356657359196251"
+      ],
+      "status": "ended",
+      "createdAt": 1789516082227
+    },
+    "RAFFLE-0008": {
+      "id": "RAFFLE-0008",
+      "title": "test",
+      "description": "test",
+      "winners": 2,
+      "duration": "1h",
+      "endTime": 1789710607209,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1550368312171565207",
+      "creatorId": "1509356657359196251",
+      "participants": [],
+      "winnersSelected": [],
+      "status": "cancelled",
+      "createdAt": 1789707007210
+    },
+    "RAFFLE-0009": {
+      "id": "RAFFLE-0009",
+      "title": "hjgj",
+      "description": "ugi",
+      "winners": 1,
+      "duration": "2m",
+      "endTime": 1790816761108,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1555022445952368753",
+      "creatorId": "1509356657359196251",
+      "participants": [
+        "1171834096046051421",
+        "1509356657359196251"
+      ],
+      "winnersSelected": [
+        "1171834096046051421"
+      ],
+      "status": "ended",
+      "createdAt": 1790816641108,
+      "rerolls": [
+        {
+          "winnerNumber": null,
+          "newWinnerId": "1509356657359196251",
+          "rerolledBy": "1509356657359196251",
+          "rerolledAt": 1790816805344
+        }
+      ]
+    },
+    "RAFFLE-0010": {
+      "id": "RAFFLE-0010",
+      "title": "7362",
+      "description": "test",
+      "winners": 2,
+      "duration": "2m",
+      "endTime": 1790819350623,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1555033313293373505",
+      "creatorId": "1509356657359196251",
+      "participants": [
+        "1509356657359196251"
+      ],
+      "winnersSelected": [
+        "1509356657359196251"
+      ],
+      "status": "ended",
+      "createdAt": 1790819230624,
+      "participantEmails": {
+        "1509356657359196251": "exo@gmail.com"
+      }
+    },
+    "RAFFLE-0011": {
+      "id": "RAFFLE-0011",
+      "title": "test",
+      "description": "test",
+      "winners": 10,
+      "duration": "24h",
+      "endTime": 1790985663992,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1555368988840562749",
+      "creatorId": "1509356657359196251",
+      "participants": [],
+      "winnersSelected": [],
+      "status": "active",
+      "createdAt": 1790899264913
+    },
+    "RAFFLE-0012": {
+      "id": "RAFFLE-0012",
+      "title": "hamato yoshi testing",
+      "description": "testing for 3dceased",
+      "winners": 10,
+      "duration": "5h",
+      "endTime": 1790924694421,
+      "guildId": "1542302785909817404",
+      "channelId": "1545675486959767583",
+      "messageId": "1555400170034831410",
+      "creatorId": "1171834096046051421",
+      "banner": "/uploads/RAFFLE-0012.jpg",
+      "participants": [],
+      "winnersSelected": [],
+      "status": "active",
+      "createdAt": 1790906700884
+    }
+  }
+}

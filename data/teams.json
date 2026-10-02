@@ -1,0 +1,35 @@
+{
+  "nextTeamNumber": 3,
+  "teams": {
+    "TEAM-0001": {
+      "id": "TEAM-0001",
+      "name": "3dceased",
+      "project": "3DCEASEDNFTS",
+      "discord": "https://discord.gg/tqcAeY7Dk",
+      "twitter": "https://x.com/3DCeasedNFT?s=20",
+      "ownerId": "1509356657359196251",
+      "members": [
+        {
+          "discordId": "1509356657359196251",
+          "role": "owner"
+        }
+      ],
+      "createdAt": 1790823396480
+    },
+    "TEAM-0002": {
+      "id": "TEAM-0002",
+      "name": "MAYHEM",
+      "project": "hay",
+      "discord": "https://discord.gg/tqcAeY7Dk",
+      "twitter": "https://x.com/CryptoShawn88?s=20",
+      "ownerId": "1509356657359196251",
+      "members": [
+        {
+          "discordId": "1509356657359196251",
+          "role": "owner"
+        }
+      ],
+      "createdAt": 1790823487712
+    }
+  }
+}
