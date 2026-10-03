@@ -316,7 +316,7 @@ app.get('/api/guilds/:guildId/channels', async (req, res) => {
 app.get('/auth/discord', (req, res) => {
   const params = new URLSearchParams({
     client_id: process.env.CLIENT_ID,
-    redirect_uri:'http://localhost:3000/auth/discord/callback',
+    redirect_uri:'https://whitelist-raffle-bot-production.up.railway.app/auth/discord/callback',
     response_type: 'code',
     scope: 'identify guilds'
   });
@@ -330,7 +330,7 @@ app.get('/auth/discord/callback', async (req, res) => {
     client_secret: process.env.CLIENT_SECRET,
     grant_type: 'authorization_code',
     code: String(req.query.code),
-    redirect_uri:'http://localhost:3000/auth/discord/callback',
+    redirect_uri:'https://whitelist-raffle-bot-production.up.railway.app/auth/discord/callback',
   });
   const tokenData = await fetch('https://discord.com/api/oauth2/token', {
     method: 'POST',
