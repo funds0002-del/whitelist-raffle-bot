@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 const raffleFile = path.join(__dirname, 'data', 'raffles.json');
 const teamsFile = path.join(__dirname, 'data', 'teams.json');
 const collabsFile = path.join(__dirname, 'data', 'collabs.json');
-const websiteFolder = path.join(__dirname, '..', 'website');
+const websiteFolder = path.join(__dirname, '..', 'whitelist-raffle-website');
 const uploadFolder = path.join(websiteFolder, 'uploads');
 if (!fs.existsSync(uploadFolder)) fs.mkdirSync(uploadFolder, { recursive: true });
 const upload = multer({ dest: uploadFolder });
