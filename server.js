@@ -9,6 +9,7 @@ const session = require('express-session');
 const multer = require('multer');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 const SITE = 'https://whitelist-raffle-bot-production.up.railway.app';
 
