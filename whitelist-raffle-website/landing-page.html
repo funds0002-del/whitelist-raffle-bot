@@ -3,35 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3Dceased Raffles</title>
+  <title>3DRaffles</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="logo">3DRAFFLES</div>
+      <div class="logo">3DRaffles</div>
       <nav class="nav">
-        <a href="landing-page.html">Home</a>
-        <a href="raffles.html">Raffles</a>
-        <a href="teams.html">Teams</a>
-        <a href="collabs.html">Collabs</a>
-        <a href="winners.html">Winners</a>
-        <a href="/auth/discord">Login with Discord</a>
+        <a class="btn" href="account.html">Create account</a>
+        <a class="btn gray" href="account.html">Log in</a>
       </nav>
     </header>
 
-    <section class="hero" style="padding-top:70px;">
-      <h1>Raffles and collabs for Web3 teams</h1>
-      <p>
-        Create a team, run whitelist raffles, and manage cross-project collabs.
-        Your community enters on the website or in Discord.
-      </p>
-      <p style="margin-top:24px;">
-        <a class="btn" href="account.html">Create account</a>
-<a class="btn gray" href="account.html">Login</a>
-      </p>
+    <section class="splash-banner">
+      <div>
+        <p class="status">Whitelist desk</p>
+        <h1>Raffles and collabs for Web3 teams</h1>
+        <p>Create a team, run whitelist raffles, and manage cross-project collabs.</p>
+      </div>
+    </section>
+
+    <section class="feature-row">
+      <article class="card"><div class="banner"></div><div class="card-body"><h3>Featured raffle</h3><p class="meta">Add your project image here</p></div></article>
+      <article class="card"><div class="banner"></div><div class="card-body"><h3>Staff pick</h3><p class="meta">Second featured raffle</p></div></article>
+      <article class="card"><div class="banner"></div><div class="card-body"><h3>Ending soon</h3><p class="meta">Third featured raffle</p></div></article>
+    </section>
+
+    <section class="split">
+      <div class="card" style="padding:18px;">
+        <h3>New raffles</h3>
+        <p class="meta">Name, project, and time left will load here.</p>
+        <a class="btn" href="account.html">Enter</a>
+      </div>
+      <div class="card" style="padding:18px;">
+        <h3>Ending soon</h3>
+        <p class="meta">Raffles close to their end time will show here.</p>
+        <a class="btn" href="account.html">Enter</a>
+      </div>
     </section>
   </div>
-  <script src="app.js"></script>
 </body>
 </html>
