@@ -174,3 +174,5 @@ input, select {
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 22px 0 60px; }
 @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (max-width: 800px) { .split { grid-template-columns: 1fr; } }
+.slide-card { width: 320px; }
+.slide-card img, .slide-card.empty div { width: 320px; height: 180px; }
