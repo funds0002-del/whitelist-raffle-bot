@@ -142,3 +142,12 @@ input, select {
   .nav.open { display: flex; }
   .nav a { padding: 12px 10px; }
 }
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 22px 0 60px;
+}
+@media (max-width: 800px) {
+  .split { grid-template-columns: 1fr; }
+}
