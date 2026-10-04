@@ -1,1 +1,43 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Account</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>3DRaffles</h1>
+      <p>Create an account to use the site.</p>
+    </section>
+    <section class="card" style="padding:18px;">
+      <p style="margin:12px 0;"><input id="username" placeholder="Username"></p>
+      <p style="margin:12px 0;"><input id="password" type="password" placeholder="Password"></p>
+      <button class="btn" id="register-btn">Create account</button>
+      <button class="btn gray" id="login-btn">Login</button>
+      <p class="meta" id="result"></p>
+    </section>
+  </div>
+  <script>
+    async function send(url) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        document.getElementById('result').textContent = data.error || 'Failed';
+        return;
+      }
+      window.location.href = '/raffles.html';
+    }
+    document.getElementById('register-btn').onclick = () => send('/api/register');
+    document.getElementById('login-btn').onclick = () => send('/api/login');
+  </script>
+</body>
+</html>
