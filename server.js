@@ -430,4 +430,50 @@ app.get('/api/teams/:id/dashboard', (req, res) => {
   });
 });
 
+function hashPassword(password, salt) {
+  return crypto.scryptSync(password, salt, 32).toString('hex');
+}
+
+function requireAccount(req, res, next) {
+  if (!req.session.account) return res.status(401).json({ error: 'Create an account first.' });
+  next();
+}
+
+app.post('/api/register', (req, res) => {
+  const username = String(req.body.username || '').trim();
+  const password = String(req.body.password || '');
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+    return res.status(400).json({ error: 'Username must be 3 to 20 letters or numbers.' });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
+  }
+  const data = loadJson(usersFile, { users: [] });
+  if ((data.users || []).some(user => user.username.toLowerCase() === username.toLowerCase())) {
+    return res.status(400).json({ error: 'That username is taken.' });
+  }
+  const salt = crypto.randomBytes(16).toString('hex');
+  data.users = data.users || [];
+  data.users.push({ username, salt, passwordHash: hashPassword(password, salt) });
+  saveJson(usersFile, data);
+  req.session.account = { username };
+  req.session.save(() => res.json({ ok: true }));
+});
+
+app.post('/api/login', (req, res) => {
+  const username = String(req.body.username || '').trim();
+  const password = String(req.body.password || '');
+  const account = (loadJson(usersFile, { users: [] }).users || [])
+    .find(user => user.username.toLowerCase() === username.toLowerCase());
+  if (!account || hashPassword(password, account.salt) !== account.passwordHash) {
+    return res.status(401).json({ error: 'Wrong username or password.' });
+  }
+  req.session.account = { username: account.username };
+  req.session.save(() => res.json({ ok: true }));
+});
+
+app.get('/api/account', (req, res) => {
+  res.json(req.session.account || null);
+});
+
 app.listen(PORT, () => console.log('Website running on port ' + PORT));
