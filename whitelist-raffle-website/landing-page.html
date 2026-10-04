@@ -15,10 +15,16 @@
         <a class="btn" href="account.html">Log in</a>
       </nav>
     </header>
+
     <section class="hero">
       <h1>Raffles and collabs for Web3 teams</h1>
       <p>Create a team, run whitelist raffles, and manage cross-project collabs.</p>
     </section>
+
+    <section class="marquee">
+      <div class="marquee-track" id="raffle-slide"></div>
+    </section>
+
     <section class="split">
       <div class="card" style="padding:18px;">
         <h3>New raffles</h3>
@@ -34,8 +40,24 @@
     function row(raffle) {
       return '<p class="meta"><a href="raffle.html?id=' + raffle.id + '">' + raffle.title + '</a></p>';
     }
+
     fetch('/api/raffles').then(r => r.json()).then(raffles => {
-      const active = (raffles || []).filter(raffle => raffle.status === 'active');
+      const all = raffles || [];
+      const active = all.filter(raffle => raffle.status === 'active');
+      const withPics = all.filter(raffle => raffle.banner);
+      const slide = (active.filter(raffle => raffle.banner).length ? active.filter(raffle => raffle.banner) : withPics).slice(0, 8);
+
+      const cards = slide.length
+        ? slide.map(raffle =>
+            '<a class="slide-card" href="raffle.html?id=' + raffle.id + '">' +
+            '<img src="' + raffle.banner + '" alt="">' +
+            '<span>' + raffle.title + '</span></a>'
+          )
+        : [1, 2, 3].map(() =>
+            '<div class="slide-card empty"><div></div><span>Waiting for a raffle</span></div>'
+          );
+
+      document.getElementById('raffle-slide').innerHTML = cards.join('') + cards.join('');
       document.getElementById('new-raffles').innerHTML = active.slice(0, 5).map(row).join('') || '<p class="meta">No new raffles.</p>';
       document.getElementById('ending-soon').innerHTML = [...active].sort((a, b) => (a.endTime || 0) - (b.endTime || 0)).slice(0, 5).map(row).join('') || '<p class="meta">Nothing ending soon.</p>';
     });
