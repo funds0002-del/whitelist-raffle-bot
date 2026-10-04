@@ -53,11 +53,11 @@
             '<img src="' + raffle.banner + '" alt="">' +
             '<span>' + raffle.title + '</span></a>'
           )
-        : [1, 2, 3].map(() =>
+        : [1, 2, 3, 4, 5, 6, 7,8].map(() =>
             '<div class="slide-card empty"><div></div><span>Waiting for a raffle</span></div>'
           );
 
-      document.getElementById('raffle-slide').innerHTML = cards.join('') + cards.join('');
+     document.getElementById('raffle-slide').innerHTML = cards.join('') + cards.join('') + cards.join('') + cards.join('');
       document.getElementById('new-raffles').innerHTML = active.slice(0, 5).map(row).join('') || '<p class="meta">No new raffles.</p>';
       document.getElementById('ending-soon').innerHTML = [...active].sort((a, b) => (a.endTime || 0) - (b.endTime || 0)).slice(0, 5).map(row).join('') || '<p class="meta">Nothing ending soon.</p>';
     });
