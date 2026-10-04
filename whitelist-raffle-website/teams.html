@@ -90,5 +90,10 @@
 
     loadTeams();
   </script>
+  <script>
+  fetch('/api/account').then(r => r.json()).then(account => {
+    if (!account) window.location.href = '/account.html';
+  });
+</script>
 </body>
 </html>
