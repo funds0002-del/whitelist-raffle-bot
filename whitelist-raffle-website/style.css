@@ -151,3 +151,18 @@ input, select {
 @media (max-width: 800px) {
   .split { grid-template-columns: 1fr; }
 }
+.marquee { overflow: hidden; margin: 22px 0; }
+.marquee-track { display: flex; gap: 14px; width: max-content; animation: slide 22s linear infinite; }
+.slide-card {
+  width: 220px;
+  background: rgba(22, 34, 28, 0.85);
+  border: 1px solid rgba(186, 230, 196, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.slide-card img { width: 220px; height: 120px; object-fit: cover; display: block; }
+.slide-card span { display: block; padding: 10px 12px; }
+@keyframes slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
