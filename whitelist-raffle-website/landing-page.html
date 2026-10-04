@@ -12,16 +12,13 @@
     <header>
       <div class="logo">3DRaffles</div>
       <nav class="nav">
-        <a class="btn" href="account.html">Create account</a>
-        <a class="btn gray" href="account.html">Log in</a>
+        <a class="btn" href="account.html">Log in</a>
       </nav>
     </header>
-
     <section class="hero">
       <h1>Raffles and collabs for Web3 teams</h1>
-      <p>Create a team, run whitelist raffles, and manage cross-project collabs. Your community enters on the website or in Discord.</p>
+      <p>Create a team, run whitelist raffles, and manage cross-project collabs.</p>
     </section>
-
     <section class="split">
       <div class="card" style="padding:18px;">
         <h3>New raffles</h3>
@@ -35,15 +32,12 @@
   </div>
   <script>
     function row(raffle) {
-      return '<p class="meta"><a href="raffle.html?id=' + raffle.id + '">' +
-        raffle.title + ' · ' + (raffle.ends || '') + '</a></p>';
+      return '<p class="meta"><a href="raffle.html?id=' + raffle.id + '">' + raffle.title + '</a></p>';
     }
     fetch('/api/raffles').then(r => r.json()).then(raffles => {
       const active = (raffles || []).filter(raffle => raffle.status === 'active');
-      const newest = active.slice(0, 5);
-      const ending = [...active].sort((a, b) => (a.endTime || 0) - (b.endTime || 0)).slice(0, 5);
-      document.getElementById('new-raffles').innerHTML = newest.map(row).join('') || '<p class="meta">No new raffles.</p>';
-      document.getElementById('ending-soon').innerHTML = ending.map(row).join('') || '<p class="meta">Nothing ending soon.</p>';
+      document.getElementById('new-raffles').innerHTML = active.slice(0, 5).map(row).join('') || '<p class="meta">No new raffles.</p>';
+      document.getElementById('ending-soon').innerHTML = [...active].sort((a, b) => (a.endTime || 0) - (b.endTime || 0)).slice(0, 5).map(row).join('') || '<p class="meta">Nothing ending soon.</p>';
     });
   </script>
 </body>
