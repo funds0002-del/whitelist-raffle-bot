@@ -457,4 +457,21 @@ app.get('/api/teams/:id/dashboard', (req, res) => {
   });
 });
 
+app.post('/api/register', (req, res) => {
+  res.status(403).json({ error: 'New accounts are closed.' });
+});
+
+app.post('/api/login', (req, res) => {
+  const password = String(req.body.password || '');
+  if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Wrong password.' });
+  }
+  req.session.account = { username: 'admin' };
+  req.session.save(() => res.json({ ok: true }));
+});
+
+app.get('/api/account', (req, res) => {
+  res.json(req.session.account || null);
+});
+
 app.listen(PORT, () => console.log('Website running on port ' + PORT));
