@@ -16,7 +16,7 @@
       </nav>
     </header>
 
-    <section class="splash-banner">
+    <section class="splash-banner" style="background-image:linear-gradient(90deg, rgba(10,20,16,.88), rgba(10,20,16,.35)), url('hero.png'); background-size:cover;">
       <div>
         <p class="status">Whitelist desk</p>
         <h1>Raffles and collabs for Web3 teams</h1>
@@ -24,24 +24,30 @@
       </div>
     </section>
 
-    <section class="feature-row">
-      <article class="card"><div class="banner"></div><div class="card-body"><h3>Featured raffle</h3><p class="meta">Add your project image here</p></div></article>
-      <article class="card"><div class="banner"></div><div class="card-body"><h3>Staff pick</h3><p class="meta">Second featured raffle</p></div></article>
-      <article class="card"><div class="banner"></div><div class="card-body"><h3>Ending soon</h3><p class="meta">Third featured raffle</p></div></article>
-    </section>
-
     <section class="split">
       <div class="card" style="padding:18px;">
         <h3>New raffles</h3>
-        <p class="meta">Name, project, and time left will load here.</p>
-        <a class="btn" href="account.html">Enter</a>
+        <div id="new-raffles"></div>
       </div>
       <div class="card" style="padding:18px;">
         <h3>Ending soon</h3>
-        <p class="meta">Raffles close to their end time will show here.</p>
-        <a class="btn" href="account.html">Enter</a>
+        <div id="ending-soon"></div>
       </div>
     </section>
   </div>
+  <script>
+    function row(raffle) {
+      return '<p class="meta"><a href="raffle.html?id=' + raffle.id + '">' +
+        raffle.title + ' · ' + raffle.id + '</a></p>';
+    }
+
+    fetch('/api/raffles').then(r => r.json()).then(raffles => {
+      const active = (raffles || []).filter(raffle => raffle.status === 'active');
+      const newest = [...active].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 5);
+      const ending = [...active].sort((a, b) => (a.endTime || 0) - (b.endTime || 0)).slice(0, 5);
+      document.getElementById('new-raffles').innerHTML = newest.map(row).join('') || '<p class="meta">No new raffles.</p>';
+      document.getElementById('ending-soon').innerHTML = ending.map(row).join('') || '<p class="meta">Nothing ending soon.</p>';
+    });
+  </script>
 </body>
 </html>
