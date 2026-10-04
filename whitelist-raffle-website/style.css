@@ -178,8 +178,9 @@ input, select {
 .slide-card img, .slide-card.empty div { width: 320px; height: 180px; }
 .mid-banner {
   display: block;
-  width: 100%;
+  width: 80%;
   height: auto;
   border-radius: 18px;
   margin: 22px 0;
+  margin-left: auto; margin-right: auto;
 }
