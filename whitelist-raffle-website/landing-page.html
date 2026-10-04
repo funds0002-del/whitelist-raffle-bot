@@ -12,24 +12,39 @@
     <header>
       <div class="logo">3DRaffles</div>
       <nav class="nav">
-        <a href="landing-page.html">Home</a>
-        <a href="raffles.html">Raffles</a>
-        <a href="teams.html">Teams</a>
-        <a href="collabs.html">Collabs</a>
-        <a href="winners.html">Winners</a>
-        <a href="/auth/discord">Login with Discord</a>
+        <a class="btn" href="account.html">Create account</a>
+        <a class="btn gray" href="account.html">Log in</a>
       </nav>
     </header>
 
     <section class="hero">
       <h1>Raffles and collabs for Web3 teams</h1>
       <p>Create a team, run whitelist raffles, and manage cross-project collabs. Your community enters on the website or in Discord.</p>
-      <p style="margin-top:24px;">
-        <a class="btn" href="account.html">Create account</a>
-        <a class="btn gray" href="account.html">Login</a>
-      </p>
+    </section>
+
+    <section class="split">
+      <div class="card" style="padding:18px;">
+        <h3>New raffles</h3>
+        <div id="new-raffles"></div>
+      </div>
+      <div class="card" style="padding:18px;">
+        <h3>Ending soon</h3>
+        <div id="ending-soon"></div>
+      </div>
     </section>
   </div>
-  <script src="app.js"></script>
+  <script>
+    function row(raffle) {
+      return '<p class="meta"><a href="raffle.html?id=' + raffle.id + '">' +
+        raffle.title + ' · ' + (raffle.ends || '') + '</a></p>';
+    }
+    fetch('/api/raffles').then(r => r.json()).then(raffles => {
+      const active = (raffles || []).filter(raffle => raffle.status === 'active');
+      const newest = active.slice(0, 5);
+      const ending = [...active].sort((a, b) => (a.endTime || 0) - (b.endTime || 0)).slice(0, 5);
+      document.getElementById('new-raffles').innerHTML = newest.map(row).join('') || '<p class="meta">No new raffles.</p>';
+      document.getElementById('ending-soon').innerHTML = ending.map(row).join('') || '<p class="meta">Nothing ending soon.</p>';
+    });
+  </script>
 </body>
 </html>
