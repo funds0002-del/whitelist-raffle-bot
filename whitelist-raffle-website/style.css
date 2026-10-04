@@ -181,7 +181,11 @@ header { margin-top: 200px; }
   margin: 22px 0;
 }
 .split { grid-template-columns: 1fr 1fr; }
-@media (max-width: 800px) {
-  .feature-row, .split { grid-template-columns: 1fr; }
-  .splash-banner { padding: 24px; min-height: 240px; }
+@media (max-width: 800px)
+  .top-pic {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center;
 }
