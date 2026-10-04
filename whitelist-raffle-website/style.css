@@ -179,8 +179,7 @@ input, select {
 .mid-banner {
   display: block;
   width: 100%;
-  height: 220px;
-  object-fit: cover;
+  height: auto;
   border-radius: 18px;
   margin: 22px 0;
 }
