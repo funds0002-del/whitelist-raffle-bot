@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
@@ -9,10 +10,12 @@ const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SITE = 'https://whitelist-raffle-bot-production.up.railway.app';
 
 const raffleFile = path.join(__dirname, 'data', 'raffles.json');
 const teamsFile = path.join(__dirname, 'data', 'teams.json');
 const collabsFile = path.join(__dirname, 'data', 'collabs.json');
+const usersFile = path.join(__dirname, 'data', 'users.json');
 const websiteFolder = path.join(__dirname, 'whitelist-raffle-website');
 const uploadFolder = path.join(websiteFolder, 'uploads');
 if (!fs.existsSync(uploadFolder)) fs.mkdirSync(uploadFolder, { recursive: true });
@@ -24,7 +27,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'raffle-secret',
   resave: false,
   saveUninitialized: true,
-  cookie: { httpOnly: true, sameSite: 'lax' }
+  cookie: { httpOnly: true, sameSite: 'lax', secure: true }
 }));
 
 app.get('/', (req, res) => {
@@ -49,6 +52,13 @@ function memberOf(team, userId) {
   if (!team || !userId) return false;
   if (team.ownerId === userId) return true;
   return (team.members || []).some(member => member.discordId === userId);
+}
+function hashPassword(password, salt) {
+  return crypto.scryptSync(password, salt, 32).toString('hex');
+}
+function requireAccount(req, res, next) {
+  if (!req.session.account) return res.status(401).json({ error: 'Create an account first.' });
+  next();
 }
 if (!fs.existsSync(teamsFile)) saveJson(teamsFile, { nextTeamNumber: 1, teams: {} });
 if (!fs.existsSync(collabsFile)) saveJson(collabsFile, { nextCollabNumber: 1, collabs: {} });
@@ -104,23 +114,21 @@ app.post('/api/raffles/:id/enter', async (req, res) => {
     }
   }
 
-  raffle.participants = raffle.participants || [];
   const wallet = String(req.body.wallet || '').trim();
-if (wallet && !/^0x[a-fA-F0-9]{40}$/.test(wallet)) {
-  return res.status(400).json({ error: 'Enter a valid wallet address, or leave it blank.' });
-}
-raffle.participantWallets = raffle.participantWallets || {};
-if (wallet && !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(wallet)) {
-  return res.status(400).json({ error: 'Enter a valid Solana wallet address, or leave it blank.' });
-}
+  if (wallet && !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(wallet)) {
+    return res.status(400).json({ error: 'Enter a valid Solana wallet address, or leave it blank.' });
+  }
+  raffle.participants = raffle.participants || [];
   raffle.participants.push(discordId);
   raffle.participantEmails = raffle.participantEmails || {};
   raffle.participantEmails[discordId] = email;
+  raffle.participantWallets = raffle.participantWallets || {};
+  if (wallet) raffle.participantWallets[discordId] = wallet;
   saveJson(raffleFile, data);
   res.json({ ok: true, message: 'You have entered the raffle.', entries: raffle.participants.length });
 });
 
-app.post('/api/raffles/create', upload.single('banner'), async (req, res) => {
+app.post('/api/raffles/create', upload.single('banner'), requireAccount, async (req, res) => {
   const title = String(req.body.title || '').trim();
   const description = String(req.body.description || '').trim();
   const winners = Number(req.body.winners);
@@ -204,7 +212,7 @@ app.get('/api/teams', (req, res) => {
   res.json(teams.filter(team => memberOf(team, user.id)));
 });
 
-app.post('/api/teams', (req, res) => {
+app.post('/api/teams', requireAccount, (req, res) => {
   const user = req.session.user;
   if (!user || !user.id) return res.status(401).json({ error: 'Login with Discord before creating a team.' });
   const name = String(req.body.name || '').trim();
@@ -245,7 +253,7 @@ app.get('/api/collabs', (req, res) => {
   }));
 });
 
-app.post('/api/collabs', (req, res) => {
+app.post('/api/collabs', requireAccount, (req, res) => {
   const user = req.session.user;
   if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
   const fromTeamId = String(req.body.fromTeamId || '').trim().toUpperCase();
@@ -316,7 +324,7 @@ app.get('/api/guilds/:guildId/channels', async (req, res) => {
 app.get('/auth/discord', (req, res) => {
   const params = new URLSearchParams({
     client_id: process.env.CLIENT_ID,
-    redirect_uri:'https://whitelist-raffle-bot-production.up.railway.app/auth/discord/callback',
+    redirect_uri: SITE + '/auth/discord/callback',
     response_type: 'code',
     scope: 'identify guilds'
   });
@@ -330,7 +338,7 @@ app.get('/auth/discord/callback', async (req, res) => {
     client_secret: process.env.CLIENT_SECRET,
     grant_type: 'authorization_code',
     code: String(req.query.code),
-    redirect_uri:'https://whitelist-raffle-bot-production.up.railway.app/auth/discord/callback',
+    redirect_uri: SITE + '/auth/discord/callback'
   });
   const tokenData = await fetch('https://discord.com/api/oauth2/token', {
     method: 'POST',
@@ -349,105 +357,11 @@ app.get('/auth/discord/callback', async (req, res) => {
 app.get('/api/me', (req, res) => res.json(req.session.user || null));
 app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
 
-app.post('/api/teams/:id/invite', (req, res) => {
-  const user = req.session.user;
-  const teamId = String(req.params.id || '').toUpperCase();
-  const discordId = String(req.body.discordId || '').trim();
-  const username = String(req.body.username || 'member').trim();
-  const data = loadJson(teamsFile, { teams: {} });
-  const team = data.teams[teamId];
-
-  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
-  if (!team) return res.status(404).json({ error: 'Team not found.' });
-  if (team.ownerId !== user.id) return res.status(403).json({ error: 'Only the team owner can invite.' });
-  if (!/^\d{15,25}$/.test(discordId)) return res.status(400).json({ error: 'Enter a valid Discord user ID.' });
-  if ((team.members || []).some(member => member.discordId === discordId)) {
-    return res.status(400).json({ error: 'That user is already on the team.' });
-  }
-
-  team.members = team.members || [];
-  team.members.push({ discordId, username, role: 'member' });
-  saveJson(teamsFile, data);
-  res.json(team);
-});
-
-app.post('/api/teams/:id/invite-link', (req, res) => {
-  const user = req.session.user;
-  const data = loadJson(teamsFile, { teams: {} });
-  const team = data.teams[String(req.params.id || '').toUpperCase()];
-  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
-  if (!team) return res.status(404).json({ error: 'Team not found.' });
-  if (team.ownerId !== user.id) return res.status(403).json({ error: 'Only the team owner can invite.' });
-
-  const code = Math.random().toString(36).slice(2, 10);
-  team.invites = team.invites || [];
-  team.invites.push({ code, createdAt: Date.now() });
-  saveJson(teamsFile, data);
-  res.json({ link: '/join.html?code=' + code + '&team=' + team.id });
-});
-
-app.post('/api/join', (req, res) => {
-  const user = req.session.user;
-  const code = String(req.body.code || '').trim();
-  const teamId = String(req.body.team || '').trim().toUpperCase();
-  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
-
-  const data = loadJson(teamsFile, { teams: {} });
-  const team = data.teams[teamId];
-  if (!team) return res.status(404).json({ error: 'Team not found.' });
-  if (!(team.invites || []).some(invite => invite.code === code)) {
-    return res.status(400).json({ error: 'Invite link is not valid.' });
-  }
-  if ((team.members || []).some(member => member.discordId === user.id)) {
-    return res.json({ ok: true, message: 'You are already on this team.' });
-  }
-
-  team.members = team.members || [];
-  team.members.push({ discordId: user.id, username: user.username, role: 'member' });
-  saveJson(teamsFile, data);
-  res.json({ ok: true, message: 'You joined ' + team.name });
-});
-
-app.get('/api/teams/:id/dashboard', (req, res) => {
-  const user = req.session.user;
-  const team = loadJson(teamsFile, { teams: {} }).teams[String(req.params.id || '').toUpperCase()];
-  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
-  if (!team) return res.status(404).json({ error: 'Team not found.' });
-  if (!memberOf(team, user.id)) return res.status(403).json({ error: 'You are not on this team.' });
-
-  const raffles = Object.values(loadRaffles().raffles || {});
-  const collabs = Object.values(loadJson(collabsFile, { collabs: {} }).collabs || {});
-  const mine = raffles.filter(raffle => raffle.creatorId === team.ownerId);
-  const teamCollabs = collabs.filter(collab => collab.fromTeamId === team.id || collab.toTeamId === team.id);
-
-  res.json({
-    team,
-    members: team.members || [],
-    activeRaffles: mine.filter(raffle => raffle.status === 'active').length,
-    endedRaffles: mine.filter(raffle => raffle.status === 'ended').length,
-    entries: mine.reduce((sum, raffle) => sum + (raffle.participants || []).length, 0),
-    collabs: teamCollabs.length
-  });
-});
-
-function hashPassword(password, salt) {
-  return crypto.scryptSync(password, salt, 32).toString('hex');
-}
-
-function requireAccount(req, res, next) {
-  if (!req.session.account) return res.status(401).json({ error: 'Create an account first.' });
-  next();
-}
-
 app.post('/api/register', (req, res) => {
   const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
-  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
-    return res.status(400).json({ error: 'Username must be 3 to 20 letters or numbers.' });
-  }
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-  }
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return res.status(400).json({ error: 'Username must be 3 to 20 letters or numbers.' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
   const data = loadJson(usersFile, { users: [] });
   if ((data.users || []).some(user => user.username.toLowerCase() === username.toLowerCase())) {
     return res.status(400).json({ error: 'That username is taken.' });
@@ -472,8 +386,74 @@ app.post('/api/login', (req, res) => {
   req.session.save(() => res.json({ ok: true }));
 });
 
-app.get('/api/account', (req, res) => {
-  res.json(req.session.account || null);
+app.get('/api/account', (req, res) => res.json(req.session.account || null));
+
+app.post('/api/teams/:id/invite', (req, res) => {
+  const user = req.session.user;
+  const teamId = String(req.params.id || '').toUpperCase();
+  const discordId = String(req.body.discordId || '').trim();
+  const username = String(req.body.username || 'member').trim();
+  const data = loadJson(teamsFile, { teams: {} });
+  const team = data.teams[teamId];
+  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
+  if (!team) return res.status(404).json({ error: 'Team not found.' });
+  if (team.ownerId !== user.id) return res.status(403).json({ error: 'Only the team owner can invite.' });
+  if (!/^\d{15,25}$/.test(discordId)) return res.status(400).json({ error: 'Enter a valid Discord user ID.' });
+  if ((team.members || []).some(member => member.discordId === discordId)) return res.status(400).json({ error: 'That user is already on the team.' });
+  team.members = team.members || [];
+  team.members.push({ discordId, username, role: 'member' });
+  saveJson(teamsFile, data);
+  res.json(team);
+});
+
+app.post('/api/teams/:id/invite-link', (req, res) => {
+  const user = req.session.user;
+  const data = loadJson(teamsFile, { teams: {} });
+  const team = data.teams[String(req.params.id || '').toUpperCase()];
+  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
+  if (!team) return res.status(404).json({ error: 'Team not found.' });
+  if (team.ownerId !== user.id) return res.status(403).json({ error: 'Only the team owner can invite.' });
+  const code = Math.random().toString(36).slice(2, 10);
+  team.invites = team.invites || [];
+  team.invites.push({ code, createdAt: Date.now() });
+  saveJson(teamsFile, data);
+  res.json({ link: '/join.html?code=' + code + '&team=' + team.id });
+});
+
+app.post('/api/join', (req, res) => {
+  const user = req.session.user;
+  const code = String(req.body.code || '').trim();
+  const teamId = String(req.body.team || '').trim().toUpperCase();
+  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
+  const data = loadJson(teamsFile, { teams: {} });
+  const team = data.teams[teamId];
+  if (!team) return res.status(404).json({ error: 'Team not found.' });
+  if (!(team.invites || []).some(invite => invite.code === code)) return res.status(400).json({ error: 'Invite link is not valid.' });
+  if ((team.members || []).some(member => member.discordId === user.id)) return res.json({ ok: true, message: 'You are already on this team.' });
+  team.members = team.members || [];
+  team.members.push({ discordId: user.id, username: user.username, role: 'member' });
+  saveJson(teamsFile, data);
+  res.json({ ok: true, message: 'You joined ' + team.name });
+});
+
+app.get('/api/teams/:id/dashboard', (req, res) => {
+  const user = req.session.user;
+  const team = loadJson(teamsFile, { teams: {} }).teams[String(req.params.id || '').toUpperCase()];
+  if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
+  if (!team) return res.status(404).json({ error: 'Team not found.' });
+  if (!memberOf(team, user.id)) return res.status(403).json({ error: 'You are not on this team.' });
+  const raffles = Object.values(loadRaffles().raffles || {});
+  const collabs = Object.values(loadJson(collabsFile, { collabs: {} }).collabs || {});
+  const mine = raffles.filter(raffle => raffle.creatorId === team.ownerId);
+  const teamCollabs = collabs.filter(collab => collab.fromTeamId === team.id || collab.toTeamId === team.id);
+  res.json({
+    team,
+    members: team.members || [],
+    activeRaffles: mine.filter(raffle => raffle.status === 'active').length,
+    endedRaffles: mine.filter(raffle => raffle.status === 'ended').length,
+    entries: mine.reduce((sum, raffle) => sum + (raffle.participants || []).length, 0),
+    collabs: teamCollabs.length
+  });
 });
 
 app.listen(PORT, () => console.log('Website running on port ' + PORT));
