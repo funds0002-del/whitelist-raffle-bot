@@ -54,11 +54,8 @@ function memberOf(team, userId) {
   if (team.ownerId === userId) return true;
   return (team.members || []).some(member => member.discordId === userId);
 }
-function hashPassword(password, salt) {
-  return crypto.scryptSync(password, salt, 32).toString('hex');
-}
 function requireAccount(req, res, next) {
-  if (!req.session.account) return res.status(401).json({ error: 'Create an account first.' });
+  if (!req.session.account) return res.status(401).json({ error: 'Login required.' });
   next();
 }
 if (!fs.existsSync(teamsFile)) saveJson(teamsFile, { nextTeamNumber: 1, teams: {} });
@@ -97,13 +94,11 @@ app.post('/api/raffles/:id/enter', async (req, res) => {
   const discordId = String((req.session.user && req.session.user.id) || req.body.discordId || '').trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
   if (!/^\d{15,25}$/.test(discordId)) return res.status(400).json({ error: 'Login with Discord first.' });
-
   const data = loadRaffles();
   const raffle = data.raffles[raffleId];
   if (!raffle) return res.status(404).json({ error: 'Raffle not found.' });
   if (raffle.status !== 'active' || Date.now() >= raffle.endTime) return res.status(400).json({ error: 'This raffle is no longer accepting entries.' });
   if ((raffle.participants || []).includes(discordId)) return res.status(400).json({ error: 'You have already entered this raffle.' });
-
   const guildSettings = loadJson(path.join(__dirname, 'data', 'guilds.json'), { guilds: {} });
   const verifiedRoleId = guildSettings.guilds[raffle.guildId] && guildSettings.guilds[raffle.guildId].verifiedRoleId;
   if (verifiedRoleId) {
@@ -114,7 +109,6 @@ app.post('/api/raffles/:id/enter', async (req, res) => {
       return res.status(403).json({ error: 'You need the Verified role in that Discord server.' });
     }
   }
-
   const wallet = String(req.body.wallet || '').trim();
   if (wallet && !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(wallet)) {
     return res.status(400).json({ error: 'Enter a valid Solana wallet address, or leave it blank.' });
@@ -138,16 +132,13 @@ app.post('/api/raffles/create', upload.single('banner'), requireAccount, async (
   if (!title || !description || !channelId) return res.status(400).json({ error: 'Title, description, and channel are required.' });
   if (!Number.isInteger(winners) || winners < 1) return res.status(400).json({ error: 'Winners must be 1 or more.' });
   if (!Number.isFinite(hours) || hours <= 0) return res.status(400).json({ error: 'Hours must be greater than 0.' });
-
   const channel = await fetch('https://discord.com/api/v10/channels/' + channelId, {
     headers: { Authorization: 'Bot ' + process.env.DISCORD_TOKEN }
   }).then(r => r.json());
   if (!channel.guild_id) return res.status(400).json({ error: 'Bot cannot see that channel. Add the bot to the server first.' });
-
   const data = loadRaffles();
   const raffleId = createId('RAFFLE', data.nextRaffleNumber);
   data.nextRaffleNumber += 1;
-
   let bannerUrl = '';
   let bannerName = '';
   if (req.file) {
@@ -156,7 +147,6 @@ app.post('/api/raffles/create', upload.single('banner'), requireAccount, async (
     fs.renameSync(req.file.path, path.join(uploadFolder, bannerName));
     bannerUrl = '/uploads/' + bannerName;
   }
-
   const endTime = Date.now() + hours * 60 * 60 * 1000;
   const payload = {
     embeds: [{
@@ -173,7 +163,6 @@ app.post('/api/raffles/create', upload.single('banner'), requireAccount, async (
     }],
     components: [{ type: 1, components: [{ type: 2, style: 3, label: 'ENTER RAFFLE', custom_id: 'raffle_enter_' + raffleId }] }]
   };
-
   let message;
   if (bannerName) {
     const form = new FormData();
@@ -193,7 +182,6 @@ app.post('/api/raffles/create', upload.single('banner'), requireAccount, async (
     }).then(r => r.json());
   }
   if (!message.id) return res.status(400).json({ error: 'Could not post to that Discord channel.' });
-
   data.raffles[raffleId] = {
     id: raffleId, title, description, winners,
     duration: hours + 'h', endTime,
@@ -244,13 +232,7 @@ app.get('/api/collabs', (req, res) => {
   });
   res.json(mine.map(collab => {
     const raffle = collab.raffleId ? raffleData.raffles[collab.raffleId] : null;
-    return {
-      ...collab,
-      raffleTitle: raffle ? raffle.title : collab.raffleTitle || '',
-      raffleStatus: raffle ? raffle.status : null,
-      winners: raffle && raffle.status === 'ended' ? (raffle.winnersSelected || []) : [],
-      winnerEmails: raffle && raffle.status === 'ended' ? (raffle.participantEmails || {}) : {}
-    };
+    return { ...collab, raffleTitle: raffle ? raffle.title : collab.raffleTitle || '', raffleStatus: raffle ? raffle.status : null };
   }));
 });
 
@@ -359,31 +341,15 @@ app.get('/api/me', (req, res) => res.json(req.session.user || null));
 app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
 
 app.post('/api/register', (req, res) => {
-  const username = String(req.body.username || '').trim();
-  const password = String(req.body.password || '');
-  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return res.status(400).json({ error: 'Username must be 3 to 20 letters or numbers.' });
-  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-  const data = loadJson(usersFile, { users: [] });
-  if ((data.users || []).some(user => user.username.toLowerCase() === username.toLowerCase())) {
-    return res.status(400).json({ error: 'That username is taken.' });
-  }
-  const salt = crypto.randomBytes(16).toString('hex');
-  data.users = data.users || [];
-  data.users.push({ username, salt, passwordHash: hashPassword(password, salt) });
-  saveJson(usersFile, data);
-  req.session.account = { username };
-  req.session.save(() => res.json({ ok: true }));
+  res.status(403).json({ error: 'New accounts are closed.' });
 });
 
 app.post('/api/login', (req, res) => {
-  const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
-  const account = (loadJson(usersFile, { users: [] }).users || [])
-    .find(user => user.username.toLowerCase() === username.toLowerCase());
-  if (!account || hashPassword(password, account.salt) !== account.passwordHash) {
-    return res.status(401).json({ error: 'Wrong username or password.' });
+  if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Wrong password.' });
   }
-  req.session.account = { username: account.username };
+  req.session.account = { username: 'admin' };
   req.session.save(() => res.json({ ok: true }));
 });
 
@@ -391,17 +357,16 @@ app.get('/api/account', (req, res) => res.json(req.session.account || null));
 
 app.post('/api/teams/:id/invite', (req, res) => {
   const user = req.session.user;
-  const teamId = String(req.params.id || '').toUpperCase();
+  const data = loadJson(teamsFile, { teams: {} });
+  const team = data.teams[String(req.params.id || '').toUpperCase()];
   const discordId = String(req.body.discordId || '').trim();
   const username = String(req.body.username || 'member').trim();
-  const data = loadJson(teamsFile, { teams: {} });
-  const team = data.teams[teamId];
   if (!user) return res.status(401).json({ error: 'Login with Discord first.' });
   if (!team) return res.status(404).json({ error: 'Team not found.' });
   if (team.ownerId !== user.id) return res.status(403).json({ error: 'Only the team owner can invite.' });
   if (!/^\d{15,25}$/.test(discordId)) return res.status(400).json({ error: 'Enter a valid Discord user ID.' });
-  if ((team.members || []).some(member => member.discordId === discordId)) return res.status(400).json({ error: 'That user is already on the team.' });
   team.members = team.members || [];
+  if (team.members.some(member => member.discordId === discordId)) return res.status(400).json({ error: 'That user is already on the team.' });
   team.members.push({ discordId, username, role: 'member' });
   saveJson(teamsFile, data);
   res.json(team);
@@ -430,8 +395,8 @@ app.post('/api/join', (req, res) => {
   const team = data.teams[teamId];
   if (!team) return res.status(404).json({ error: 'Team not found.' });
   if (!(team.invites || []).some(invite => invite.code === code)) return res.status(400).json({ error: 'Invite link is not valid.' });
-  if ((team.members || []).some(member => member.discordId === user.id)) return res.json({ ok: true, message: 'You are already on this team.' });
   team.members = team.members || [];
+  if (team.members.some(member => member.discordId === user.id)) return res.json({ ok: true, message: 'You are already on this team.' });
   team.members.push({ discordId: user.id, username: user.username, role: 'member' });
   saveJson(teamsFile, data);
   res.json({ ok: true, message: 'You joined ' + team.name });
@@ -446,32 +411,14 @@ app.get('/api/teams/:id/dashboard', (req, res) => {
   const raffles = Object.values(loadRaffles().raffles || {});
   const collabs = Object.values(loadJson(collabsFile, { collabs: {} }).collabs || {});
   const mine = raffles.filter(raffle => raffle.creatorId === team.ownerId);
-  const teamCollabs = collabs.filter(collab => collab.fromTeamId === team.id || collab.toTeamId === team.id);
   res.json({
     team,
     members: team.members || [],
     activeRaffles: mine.filter(raffle => raffle.status === 'active').length,
     endedRaffles: mine.filter(raffle => raffle.status === 'ended').length,
     entries: mine.reduce((sum, raffle) => sum + (raffle.participants || []).length, 0),
-    collabs: teamCollabs.length
+    collabs: collabs.filter(collab => collab.fromTeamId === team.id || collab.toTeamId === team.id).length
   });
-});
-
-app.post('/api/register', (req, res) => {
-  res.status(403).json({ error: 'New accounts are closed.' });
-});
-
-app.post('/api/login', (req, res) => {
-  const password = String(req.body.password || '');
-  if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Wrong password.' });
-  }
-  req.session.account = { username: 'admin' };
-  req.session.save(() => res.json({ ok: true }));
-});
-
-app.get('/api/account', (req, res) => {
-  res.json(req.session.account || null);
 });
 
 app.listen(PORT, () => console.log('Website running on port ' + PORT));
