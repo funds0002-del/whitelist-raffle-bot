@@ -160,3 +160,26 @@ input, select {
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 }
+.splash-banner {
+  margin-top: 28px;
+  min-height: 320px;
+  padding: 48px;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(10, 20, 16, 0.88), rgba(10, 20, 16, 0.35)),
+    #1d3a2c;
+  display: flex;
+  align-items: flex-end;
+}
+.feature-row, .split {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 22px 0;
+}
+.split { grid-template-columns: 1fr 1fr; }
+@media (max-width: 800px) {
+  .feature-row, .split { grid-template-columns: 1fr; }
+  .splash-banner { padding: 24px; min-height: 240px; }
+}
