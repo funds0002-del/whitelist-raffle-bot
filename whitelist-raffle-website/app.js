@@ -93,11 +93,11 @@ async function renderRafflePage(raffles) {
       const response = await fetch('/api/raffles/' + raffle.id + '/enter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({
-  email,
-  discordId,
-  wallet: document.getElementById('wallet') ? document.getElementById('wallet').value.trim() : ''
-})
+        body: JSON.stringify({
+          email,
+          discordId,
+          wallet: document.getElementById('wallet') ? document.getElementById('wallet').value.trim() : ''
+        })
       });
       const data = await response.json();
       result.textContent = response.ok
@@ -130,6 +130,20 @@ async function updateAuthNav() {
         link.href = '/logout';
       }
     });
+
+    // Add Create Raffle button only if logged in
+    if (me && me.username) {
+      document.querySelectorAll('.nav').forEach(nav => {
+        if (!nav.querySelector('a[href="create-raffle.html"]')) {
+          const a = document.createElement('a');
+          a.href = 'create-raffle.html';
+          a.className = 'btn';
+          a.textContent = 'Create Raffle';
+          a.style.marginLeft = '8px';
+          nav.appendChild(a);
+        }
+      });
+    }
   } catch (error) {}
 }
 
