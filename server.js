@@ -129,6 +129,11 @@ app.post('/api/raffles/create', upload.single('banner'), requireAccount, async (
   const winners = Number(req.body.winners);
   const channelId = String(req.body.channelId || '').trim();
   const hours = Number(req.body.hours);
+  const requiredRoleId = String(req.body.requiredRoleId || '').trim();
+const entryType = String(req.body.entryType || 'email');
+const publicNotes = String(req.body.publicNotes || '').trim();
+const privateNotes = String(req.body.privateNotes || '').trim();
+const projectLink = String(req.body.projectLink || '').trim();
   if (!title || !description || !channelId) return res.status(400).json({ error: 'Title, description, and channel are required.' });
   if (!Number.isInteger(winners) || winners < 1) return res.status(400).json({ error: 'Winners must be 1 or more.' });
   if (!Number.isFinite(hours) || hours <= 0) return res.status(400).json({ error: 'Hours must be greater than 0.' });
