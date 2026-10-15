@@ -187,14 +187,28 @@ const projectLink = String(req.body.projectLink || '').trim();
     }).then(r => r.json());
   }
   if (!message.id) return res.status(400).json({ error: 'Could not post to that Discord channel.' });
-  data.raffles[raffleId] = {
-    id: raffleId, title, description, winners,
-    duration: hours + 'h', endTime,
-    guildId: channel.guild_id, channelId, messageId: message.id,
-    creatorId: (req.session.user && req.session.user.id) || 'website',
-    banner: bannerUrl, participants: [], winnersSelected: [],
-    status: 'active', createdAt: Date.now()
-  };
+data.raffles[raffleId] = {
+  id: raffleId,
+  title,
+  description,
+  winners,
+  duration: hours + 'h',
+  endTime,
+  guildId: channel.guild_id,
+  channelId,
+  messageId: message.id,
+  creatorId: (req.session.user && req.session.user.id) || 'website',
+  banner: bannerUrl,
+  participants: [],
+  winnersSelected: [],
+  requiredRoleId,
+  entryType,
+  publicNotes,
+  privateNotes,
+  projectLink,
+  status: 'active',
+  createdAt: Date.now()
+};
   saveJson(raffleFile, data);
   res.json({ ok: true, id: raffleId });
 });
