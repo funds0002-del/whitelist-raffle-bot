@@ -192,6 +192,29 @@ input, select {
   border: 1px solid rgba(186, 230, 196, 0.2);
   border-radius: 22px;
   text-align: center;
+  .nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  margin: 0 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(142, 227, 168, 0.45);
+  background: #8ee3a8;
+  color: #102117 !important;
+  font-weight: 700;
+  font-size: 14px;
+}
+.nav a:hover {
+  opacity: 0.9;
+}
+  .btn,
+.nav a.btn,
+.nav a[href="create-raffle.html"] {
+  color: #102117 !important;
+  font-weight: 700;
+}
   line-height: 1.9;
 } 
 .contact-box h3 { letter-spacing: 0.08em; margin-bottom: 8px; }
