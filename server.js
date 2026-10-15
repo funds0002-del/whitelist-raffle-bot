@@ -73,10 +73,14 @@ function formatRaffle(raffle) {
     ends: raffle.status === 'active' ? new Date(raffle.endTime).toLocaleString() : raffle.status,
     banner: raffle.banner || '',
     winnersSelected: [],
-    winnerEmails: {}
+    winnerEmails: {},
+    publicNotes: raffle.publicNotes || '',
+    privateNotes: raffle.privateNotes || '',
+    projectLink: raffle.projectLink || '',
+    entryType: raffle.entryType || 'email',
+    requiredRoleId: raffle.requiredRoleId || ''
   };
 }
-
 app.get('/api/raffles', (req, res) => {
   const data = loadRaffles();
   res.json(Object.values(data.raffles || {}).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(formatRaffle));
