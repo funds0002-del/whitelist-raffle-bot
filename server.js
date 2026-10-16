@@ -467,5 +467,18 @@ app.get('/api/teams/:id/dashboard', (req, res) => {
     collabs: collabs.filter(collab => collab.fromTeamId === team.id || collab.toTeamId === team.id).length
   });
 });
+app.get('/api/admin/payment-status', requireAccount, (req, res) => {
+  const userId = (req.session.user && req.session.user.id) || req.session.account.username || 'admin';
+  const payment = getPayment(userId);
+  res.json({
+    active: isPaymentActive(userId),
+    payment: payment || null
+  });
+});
 
+app.post('/api/admin/mark-paid', requireAccount, (req, res) => {
+  const userId = (req.session.user && req.session.user.id) || req.session.account.username || 'admin';
+  const payment = setPayment(userId, 30);
+  res.json({ ok: true, payment });
+});
 app.listen(PORT, () => console.log('Website running on port ' + PORT));
