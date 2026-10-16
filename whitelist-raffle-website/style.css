@@ -219,3 +219,29 @@ input, select {
 } 
 .contact-box h3 { letter-spacing: 0.08em; margin-bottom: 8px; }
 .contact-box a { color: #f3f7f4; }
+/* Consistent nav spacing */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Better card spacing */
+.card {
+  margin-bottom: 20px;
+}
+
+/* Cleaner form spacing */
+.form-group, 
+section.card p {
+  margin-bottom: 14px;
+}
+
+/* Make sure Create Raffle matches other links */
+.nav a[href="create-raffle.html"] {
+  color: var(--muted);
+  font-weight: 600;
+}
+.nav a[href="create-raffle.html"]:hover {
+  color: white;
+}
