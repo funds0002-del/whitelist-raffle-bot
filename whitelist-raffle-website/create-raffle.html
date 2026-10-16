@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <p class="meta" id="payment-status">Checking payment...</p>
   <title>Create Raffle</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -200,5 +201,22 @@
       <p>Ver: 1.261005.001</p>
     </div>
   </section>
+  <script>
+fetch('/api/admin/payment-status')
+  .then(r => r.json())
+  .then(data => {
+    const el = document.getElementById('payment-status');
+    if (!el) return;
+    if (data.active) {
+      const expiry = new Date(data.payment.expiry).toLocaleDateString();
+      el.textContent = 'Payment active until ' + expiry;
+      el.style.color = '#8ee3a8';
+    } else {
+      el.textContent = 'Payment required or expired — launching is blocked';
+      el.style.color = '#ff6b6b';
+    }
+  })
+  .catch(() => {});
+</script>
 </body>
 </html>
