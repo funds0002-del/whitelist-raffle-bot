@@ -9,23 +9,23 @@
 <body>
   <img class="top-pic" src="hero.png" alt="3DRaffles">
   <div class="wrap">
-  <header>
-  <div class="logo">3DRAFFLES</div>
-  <nav class="nav">
-    <a href="/" class="always">Home</a>
-    <a href="raffles.html" class="protected" style="display:none;">Raffles</a>
-    <a href="teams.html" class="protected" style="display:none;">Teams</a>
-    <a href="collabs.html" class="protected" style="display:none;">Collabs</a>
-    <a href="winners.html" class="protected" style="display:none;">Winners</a>
-    <a href="/account.html" id="login-link">Login</a>
-  </nav>
-</header>
+    <header>
+      <div class="logo">3DRAFFLES</div>
+      <nav class="nav">
+        <a href="/" class="always">Home</a>
+        <a href="raffles.html" class="protected" style="display:none;">Raffles</a>
+        <a href="teams.html" class="protected" style="display:none;">Teams</a>
+        <a href="collabs.html" class="protected" style="display:none;">Collabs</a>
+        <a href="winners.html" class="protected" style="display:none;">Winners</a>
+        <a href="/account.html" id="login-link">Login</a>
+      </nav>
+    </header>
 
     <section class="hero">
       <h1>Raffles and collabs for Web3 teams</h1>
       <p>Create a team, run whitelist raffles, and manage cross-project collabs.</p>
     </section>
-   <img class="mid-banner" src="banner.png" alt="3DRaffles">
+    <img class="mid-banner" src="banner.png" alt="3DRaffles">
     <section class="marquee">
       <div class="marquee-track" id="raffle-slide"></div>
     </section>
@@ -41,6 +41,7 @@
       </div>
     </section>
   </div>
+
   <script>
     function row(raffle) {
       return '<p class="meta"><a href="raffle.html?id=' + raffle.id + '">' + raffle.title + '</a></p>';
@@ -58,28 +59,42 @@
             '<img src="' + raffle.banner + '" alt="">' +
             '<span>' + raffle.title + '</span></a>'
           )
-        : [1, 2, 3, 4, 5, 6, 7,8].map(() =>
+        : [1, 2, 3, 4, 5, 6, 7, 8].map(() =>
             '<div class="slide-card empty"><div></div><span>Waiting for a raffle</span></div>'
           );
 
-     document.getElementById('raffle-slide').innerHTML = cards.join('') + cards.join('') + cards.join('') + cards.join('');
+      document.getElementById('raffle-slide').innerHTML = cards.join('') + cards.join('') + cards.join('') + cards.join('');
       document.getElementById('new-raffles').innerHTML = active.slice(0, 5).map(row).join('') || '<p class="meta">No new raffles.</p>';
       document.getElementById('ending-soon').innerHTML = [...active].sort((a, b) => (a.endTime || 0) - (b.endTime || 0)).slice(0, 5).map(row).join('') || '<p class="meta">Nothing ending soon.</p>';
     });
   </script>
-    <section class="wrap">
-  <div class="contact-box">
-    <h3>CONTACT US</h3>
-    <p>Technical Support: TechSupport@3DRaffled.com</p>
-    <p>Administration: Admin@3DRaffled.com</p>
-    <p>Illustrations: ArtWork@3DRaffled.com</p>
-    <p><a href="privacy.html">Privacy Policy</a></p>
-    <p>Based in the United States of America</p>
-    <p style="margin-top:14px;"><a href="https://x.com/3DCeasedNFT?s=20">Twitter</a></p>
-    <p>© 2026 3DRaffles<br>© 2025 3DCeased</p>
-    <p>Ver: 1.261005.001</p>
-  </div>
-</section>
+
+  <section class="wrap">
+    <div class="contact-box">
+      <h3>CONTACT US</h3>
+      <p>Technical Support: TechSupport@3DRaffled.com</p>
+      <p>Administration: Admin@3DRaffled.com</p>
+      <p>Illustrations: ArtWork@3DRaffled.com</p>
+      <p><a href="privacy.html">Privacy Policy</a></p>
+      <p>Based in the United States of America</p>
+      <p style="margin-top:14px;"><a href="https://x.com/3DCeasedNFT?s=20">Twitter</a></p>
+      <p>© 2026 3DRaffles<br>© 2025 3DCeased</p>
+      <p>Ver: 1.261005.001</p>
+    </div>
+  </section>
+
   <script src="app.js"></script>
+  <script>
+    fetch('/api/account').then(r => r.json()).then(account => {
+      if (account) {
+        document.querySelectorAll('.protected').forEach(el => el.style.display = '');
+        const loginLink = document.getElementById('login-link');
+        if (loginLink) {
+          loginLink.textContent = 'Logout';
+          loginLink.href = '/logout';
+        }
+      }
+    });
+  </script>
 </body>
 </html>
