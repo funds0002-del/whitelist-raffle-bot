@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">3DRAFFLES</div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="raffles.html">Raffles</a>
+        <a href="create-raffle.html">Create Raffle</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Payment Status</h1>
+      <p>Mark the account as paid for 30 days.</p>
+    </section>
+
+    <section class="card" style="padding:24px;">
+      <p id="status">Loading...</p>
+      <button class="btn" id="mark-paid">Mark as Paid for 30 days</button>
+      <p class="meta" id="result"></p>
+    </section>
+  </div>
+
+  <script>
+    async function loadStatus() {
+      const res = await fetch('/api/admin/payment-status');
+      const data = await res.json();
+      const statusEl = document.getElementById('status');
+      if (data.active) {
+        const expiry = new Date(data.payment.expiry).toLocaleString();
+        statusEl.textContent = 'Active until ' + expiry;
+      } else {
+        statusEl.textContent = 'Not paid or expired';
+      }
+    }
+
+    document.getElementById('mark-paid').onclick = async () => {
+      const res = await fetch('/api/admin/mark-paid', { method: 'POST' });
+      const data = await res.json();
+      document.getElementById('result').textContent = res.ok ? 'Marked as paid!' : (data.error || 'Failed');
+      loadStatus();
+    };
+
+    loadStatus();
+  </script>
+</body>
+</html>
