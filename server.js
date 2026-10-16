@@ -43,6 +43,8 @@ function loadJson(file, fallback) {
 function saveJson(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
+const paymentsFile = path.join(__dirname, 'data', 'payments.json');
+if (!fs.existsSync(paymentsFile)) saveJson(paymentsFile, {});
 function loadRaffles() {
   return loadJson(raffleFile, { nextRaffleNumber: 1, raffles: {} });
 }
@@ -57,6 +59,24 @@ function memberOf(team, userId) {
 function requireAccount(req, res, next) {
   if (!req.session.account) return res.status(401).json({ error: 'Login required.' });
   next();
+}
+function getPayment(userId) {
+  const payments = loadJson(paymentsFile, {});
+  return payments[userId] || null;
+}
+
+function setPayment(userId, days = 30) {
+  const payments = loadJson(paymentsFile, {});
+  const expiry = Date.now() + days * 24 * 60 * 60 * 1000;
+  payments[userId] = { status: 'active', expiry, updatedAt: Date.now() };
+  saveJson(paymentsFile, payments);
+  return payments[userId];
+}
+
+function isPaymentActive(userId) {
+  const payment = getPayment(userId);
+  if (!payment) return false;
+  return payment.status === 'active' && payment.expiry > Date.now();
 }
 if (!fs.existsSync(teamsFile)) saveJson(teamsFile, { nextTeamNumber: 1, teams: {} });
 if (!fs.existsSync(collabsFile)) saveJson(collabsFile, { nextCollabNumber: 1, collabs: {} });
