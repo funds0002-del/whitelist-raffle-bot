@@ -148,6 +148,10 @@ app.post('/api/raffles/:id/enter', async (req, res) => {
 });
 
 app.post('/api/raffles/create', upload.single('banner'), requireAccount, async (req, res) => {
+  const userId = (req.session.user && req.session.user.id) || (req.session.account && req.session.account.username) || 'admin';
+if (!isPaymentActive(userId)) {
+  return res.status(402).json({ error: 'Payment required or expired. Please renew to launch raffles.' });
+}
   const title = String(req.body.title || '').trim();
   const description = String(req.body.description || '').trim();
   const winners = Number(req.body.winners);
