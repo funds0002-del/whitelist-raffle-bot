@@ -192,58 +192,17 @@ input, select {
   border: 1px solid rgba(186, 230, 196, 0.2);
   border-radius: 22px;
   text-align: center;
-  .nav a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 36px;
-  padding: 0 14px;
-  margin: 0 4px;
-  border-radius: 12px;
-  border: 1px solid rgba(142, 227, 168, 0.45);
-  background: #8ee3a8;
-  color: #102117 !important;
-  font-weight: 700;
-  font-size: 14px;
-}
-.nav a:hover {
-  opacity: 0.9;
-}
-  .btn,
-.nav a.btn,
-.nav a[href="create-raffle.html"] {
-  color: #102117 !important;
-  font-weight: 700;
-}
   line-height: 1.9;
-} 
+}
 .contact-box h3 { letter-spacing: 0.08em; margin-bottom: 8px; }
 .contact-box a { color: #f3f7f4; }
-/* Consistent nav spacing */
+
+/* Consistent navigation buttons */
 .nav {
   display: flex;
   align-items: center;
-  gap: 18px;
-}
-
-/* Better card spacing */
-.card {
-  margin-bottom: 20px;
-}
-
-/* Cleaner form spacing */
-.form-group, 
-section.card p {
-  margin-bottom: 14px;
-}
-
-/* Make sure Create Raffle matches other links */
-.nav a[href="create-raffle.html"] {
-  color: var(--muted);
-  font-weight: 600;
-}
-.nav a[href="create-raffle.html"]:hover {
-  color: white;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 .nav a {
   display: inline-flex;
@@ -251,7 +210,6 @@ section.card p {
   justify-content: center;
   min-height: 36px;
   padding: 0 16px;
-  margin: 0 4px;
   border-radius: 12px;
   border: 1px solid rgba(142, 227, 168, 0.45);
   background: #8ee3a8;
@@ -260,7 +218,32 @@ section.card p {
   font-size: 14px;
   text-decoration: none;
 }
-
 .nav a:hover {
   opacity: 0.9;
+}
+
+/* Better spacing */
+.card {
+  margin-bottom: 24px;
+}
+.hero {
+  margin-bottom: 32px;
+}
+.form-group,
+section.card p {
+  margin-bottom: 16px;
+}
+
+/* Mobile improvements */
+@media (max-width: 800px) {
+  .nav {
+    gap: 8px;
+  }
+  .nav a {
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  .hero {
+    padding: 32px 20px;
+  }
 }
