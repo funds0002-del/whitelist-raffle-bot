@@ -30,6 +30,9 @@ client.commands.set(
   raffleCommand.data.name,
   raffleCommand
 );
+const unlockedUsers = new Set();
+const PASSWORD_ENABLED = process.env.BOT_PASSWORD_ENABLED === 'true';
+const BOT_PASSWORD = process.env.BOT_PASSWORD || 'changeme';
 
 // ==============================
 // DATA STORAGE
@@ -681,6 +684,28 @@ client.once(
 client.on(
   'interactionCreate',
   async interaction => {
+        // ===== PASSWORD LOCK =====
+    if (PASSWORD_ENABLED && interaction.isChatInputCommand()) {
+      const userId = interaction.user.id;
+
+      if (!unlockedUsers.has(userId)) {
+        if (interaction.commandName === 'unlock') {
+          const password = interaction.options.getString('password');
+          if (password === BOT_PASSWORD) {
+            unlockedUsers.add(userId);
+            return interaction.reply({ content: 'Unlocked! You can now use bot commands.', ephemeral: true });
+          } else {
+            return interaction.reply({ content: 'Wrong password.', ephemeral: true });
+          }
+        }
+
+        return interaction.reply({
+          content: 'Bot is locked. Use `/unlock` and enter the password first.',
+          ephemeral: true
+        });
+      }
+    }
+    // ===== END PASSWORD LOCK =====
 
     // ==============================
     // RAFFLE CREATION FORM
