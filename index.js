@@ -30,7 +30,7 @@ client.commands.set(
   raffleCommand.data.name,
   raffleCommand
 );
-const unlockCommand = require('./commands/unlock.js');
+const unlockCommand = require('./unlock.js');
 client.commands.set(unlockCommand.data.name, unlockCommand);
 const unlockedUsers = new Set();
 const PASSWORD_ENABLED = process.env.BOT_PASSWORD_ENABLED === 'true';
